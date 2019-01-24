@@ -1,0 +1,8 @@
+name: TopRank
+main: com.TopRank.Main
+version: 1.0
+commands:
+  toprank:
+        description: 'Game Command (Made by MINUTE.)'
+        usage: 'usage: /<command> - Check Game Command.'
+   
