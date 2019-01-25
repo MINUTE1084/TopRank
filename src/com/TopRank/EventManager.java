@@ -1,14 +1,20 @@
 package com.TopRank;
 
+import java.util.Random;
+
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SmallFireball;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -35,23 +41,28 @@ public class EventManager implements Listener {
 		}
 	}
 	
-	public static void onPlayerRespawn(PlayerRespawnEvent event)
+	@EventHandler
+	public static void onPlayerDeath(PlayerDeathEvent event)
 	{
 		if (Main.GAME_START) {
-			Player p = event.getPlayer();
+			Player p = event.getEntity();
 			for (PlayerInfo pl : PlayerManager.PlayerDatas){
-				if (pl.getData() == p) {
+				if (pl.getData() == p && !pl.getOut()) {
+					p.spigot().respawn();
 					if (Main.ARENA_MODE) {
 						p.teleport(PlayerManager.arenaLoc);
 					}
 					else {
-						p.teleport(PlayerManager.locs.get(0));
+						Random random = new Random();
+						Location randomloc = PlayerManager.locs.get(random.nextInt(PlayerManager.locs.size()));
+						p.teleport(randomloc);
 					}
 					return;
 				}
 			}
 		}
 	}
+	
 	@EventHandler
 	public static void onEntityDamageByEntity(EntityDamageByEntityEvent event)
 	{
@@ -77,6 +88,24 @@ public class EventManager implements Listener {
 						damager = (Player) snow.getShooter();
 					else return;
 				}
+				else if (event.getDamager() instanceof SmallFireball) {
+					Snowball snow=(Snowball)event.getDamager();
+					if(snow.getShooter() instanceof Player)
+						damager = (Player) snow.getShooter();
+					else return;
+				}
+				else if (event.getDamager() instanceof Fireball) {
+					Fireball fireball=(Fireball)event.getDamager();
+					if(fireball.getShooter() instanceof Player)
+						damager = (Player) fireball.getShooter();
+					else return;
+				}
+				else if (event.getDamager() instanceof SmallFireball) {
+					SmallFireball smallfireball = (SmallFireball)event.getDamager();
+					if(smallfireball.getShooter() instanceof Player)
+						damager = (Player) smallfireball.getShooter();
+					else return;
+				}
 				else return;
 			}
 			else return;
@@ -87,6 +116,7 @@ public class EventManager implements Listener {
 					damager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Main.PANELTY_TIME*20, 2));
 					damager.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, Main.PANELTY_TIME*20, 100));
 					damager.sendMessage("\2471[\247bTopRank\2471] \247c잘못된 킬로 인해 \2474" + String.valueOf(Main.PANELTY_TIME) + "초 \247c동안 패널티를 받습니다!");
+					damager.playSound(damager.getLocation(), Sound.ENTITY_WITHER_AMBIENT, 10, 1.2f);
 				}
 			}
 			else return;

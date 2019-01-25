@@ -11,8 +11,7 @@ public class TaskManager {
 	static int time_ArenaOut = 0, ArenaOut_Scheduler = 0;
 	
 	public static void ExplaneTimer(Main main) {
-		int Dealy = 20;
-		if (Main.QUICK_START) Dealy = 5;
+		int Dealy = 15;
 		
 		Explane_Scheduler = main.getServer().getScheduler().scheduleSyncRepeatingTask(main, new Runnable() {
 			public void run() {
@@ -23,46 +22,67 @@ public class TaskManager {
 					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a게임을 시작합니다.");
 					break;
 				case 1:
-					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247aTopRank는 게임 시간 동안 가장 높은 순위를 차지하면 승리하는 게임입니다.");
+					if (Main.QUICK_START) StartTimer(main);
 					break;
 				case 2:
-					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a자신보다 한 단계 위 플레이어를 죽이면, 승급할 수 있습니다.");
+					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247aTopRank는 게임 시간 동안 가장 높은 순위를 차지하면 승리하는 게임입니다.");
 					break;
 				case 3:
-					if (Main.TIMER_OUT >= 1)
-						Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a게임 시작 후 " + Main.TIMER_OUT + "초마다 가작 낮은 순위의 플레이어는 탈락합니다.");
 					break;
 				case 4:
-					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a또한, 1위 플레이어가 가장 낮은 순위의 플레이어를 죽이면, 해당 플레이어가 탈락합니다.");
+					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a자신보다 한 단계 위 플레이어를 죽이면, 승급할 수 있습니다.");
 					break;
 				case 5:
-					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a게임 시작 이후 특정 조건을 만족하면 ARENA MODE에 진입합니다.");
 					break;
 				case 6:
+					if (Main.TIMER_OUT >= 1)
+						Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a게임 시작 후 " + Main.TIMER_OUT + "초마다 가장 낮은 순위의 플레이어는 탈락합니다.");
+					break;
+				case 7:
+					break;
+				case 8:
+					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a또한, 1위 플레이어가 가장 낮은 순위의 플레이어를 죽이면, 해당 플레이어가 탈락합니다.");
+					break;
+				case 9:
+					break;
+				case 10:
+					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a게임 시작 이후 특정 조건을 만족하면 ARENA MODE에 진입합니다.");
+					break;
+				case 11:
+					break;
+				case 12:
 					if (Main.ARENA_OUT_ACTIVE != true)
 						Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247aARENA MODE에서는 1위 플레이어가 최하 플레이어를 탈락시킬 수 없으며, " + Main.ARENA_TIMER_OUT + "초마다 가장 낮은 순위의 플레이어는 탈락합니다.");
 					else
 						Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247aARENA MODE에서는 " + Main.ARENA_TIMER_OUT + "초마다 가장 낮은 순위의 플레이어는 탈락합니다.");
 					break;
-				case 7:
+				case 13:
+					break;
+				case 14:
 					if (Main.FIRST_SHOW_RANKING != true)
 						Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a잠시 후, 전체 순위 발표화 함께 게임이 시작됩니다.");
 					else 
 						Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a잠시 후, 게임이 시작됩니다.");
 					break;
-				case 8:
+				case 15:
+					break;
+				case 16:
+					break;
+				case 17:
+					break;
+				case 18:
 					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a5");
 					break;
-				case 9:
+				case 19:
 					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247a4");
 					break;
-				case 10:
+				case 20:
 					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \24763");
 					break;
-				case 11:
+				case 21:
 					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247c2");
 					break;
-				case 12:
+				case 22:
 					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \24741");
 					break;
 				default:
@@ -91,13 +111,14 @@ public class TaskManager {
 					}
 					break;
 				default:
-					if (Main.ARENA_START_TIME >= 0) {
-						if (Main.ARENA_START_TIME * 60 <= time_Main || Main.ARENA_START_PERSON == 0) {
+					if (Main.ARENA_START_TIME >= 0 || Main.ARENA_START_PERSON >= 0) {
+						if (Main.ARENA_START_TIME * 60 <= time_Main || Main.ARENA_START_PERSON <= PlayerManager.RemainPlayer) {
 							ArenaStartTimer(main);
 						}
 					}
 				}
-				System.out.println("[TopRank] Main : " + String.valueOf(time_Main));
+				if (Main.DEBUG_SCHEDULER)
+					System.out.println("[TopRank] Main : " + String.valueOf(time_Main));
 				time_Main++;
 			}
 		}, 0, 20);
@@ -107,13 +128,15 @@ public class TaskManager {
 		ArenaMain_Scheduler = main.getServer().getScheduler().scheduleSyncRepeatingTask(main, new Runnable() {
 			public void run() {
 				main.getServer().getScheduler().cancelTask(Main_Scheduler);
+				main.getServer().getScheduler().cancelTask(Out_Scheduler);
 				if (time_ArenaMain == 0) {
 					Main.ARENA_MODE = true;
 					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \2476ARENA MODE");
 					PlayerManager.ArenaTeleport();
 					ArenaOutTimer(main);
 				}
-				System.out.println("[TopRank] ArenaMain : " + String.valueOf(time_ArenaMain));
+				if (Main.DEBUG_SCHEDULER)
+					System.out.println("[TopRank] ArenaMain : " + String.valueOf(time_ArenaMain));
 				time_ArenaMain++;
 			}
 		}, 0, 20);
@@ -126,7 +149,8 @@ public class TaskManager {
 					if (time_Broadcast != 0) {
 						PlayerManager.showRanking();
 					}
-					System.out.println("[TopRank] Broadcast : " + String.valueOf(time_Broadcast));
+					if (Main.DEBUG_SCHEDULER)
+						System.out.println("[TopRank] Broadcast : " + String.valueOf(time_Broadcast));
 					time_Broadcast++;
 				}
 			}, 0, Main.TIMER_SHOW_RANKING * 20);
@@ -146,7 +170,8 @@ public class TaskManager {
 						if (time_Out != 0) {
 							PlayerManager.playerOut();
 						}
-						System.out.println("[TopRank] Out : " + String.valueOf(time_Out));
+						if (Main.DEBUG_SCHEDULER)
+							System.out.println("[TopRank] Out : " + String.valueOf(time_Out));
 					time_Out++;
 					}
 				}, 0, Main.TIMER_OUT * 20);
@@ -169,7 +194,8 @@ public class TaskManager {
 						else {
 							PlayerManager.playerOut();
 						}
-						System.out.println("[TopRank] ArenaOut : " + String.valueOf(time_ArenaOut));
+						if (Main.DEBUG_SCHEDULER)
+							System.out.println("[TopRank] ArenaOut : " + String.valueOf(time_ArenaOut));
 						time_ArenaOut++;
 					}
 				}, 0, Main.ARENA_TIMER_OUT * 20);

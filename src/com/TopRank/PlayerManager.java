@@ -5,10 +5,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -57,6 +60,9 @@ public class PlayerManager {
 			}
 			if (Main.FIRST_GIVE_ITEM)
 				PlayerDatas.get(i).getData().getInventory().addItem(new ItemStack(Material.STONE_SWORD, 1));
+			PlayerDatas.get(i).getData().setHealth(20);
+			PlayerDatas.get(i).getData().setGameMode(GameMode.SURVIVAL);
+			PlayerDatas.get(i).getData().setFoodLevel(20);
 		}
 		
 		Collections.sort(PlayerDatas, new MiniComparator());
@@ -71,6 +77,8 @@ public class PlayerManager {
 			pl.getData().teleport(randomloc);
 			pl.getData().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
 			pl.getData().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100, 49));
+			if (pl.getRank() == 1)
+				pl.getData().playSound(randomloc, Sound.ENTITY_FIREWORK_LARGE_BLAST, 100L, 1L);
 		}
 	}
 	
@@ -81,6 +89,8 @@ public class PlayerManager {
 				pl.getData().teleport(arenaLoc);
 				pl.getData().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100, 2));
 				pl.getData().addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 100, 49));
+				if (pl.getRank() == 1)
+					pl.getData().playSound(arenaLoc, Sound.BLOCK_END_PORTAL_SPAWN, 100L, 1L);
 			}
 		}
 	}
@@ -92,6 +102,7 @@ public class PlayerManager {
 				switch (PlayerDatas.get(i).getRank()) {
 				case 1:
 					Bukkit.broadcastMessage("\247b" + String.valueOf(PlayerDatas.get(i).getRank()) + "st : \247a" + PlayerDatas.get(i).getName());
+					PlayerDatas.get(i).getData().playSound(arenaLoc, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 100L, 2L);
 					break;
 				case 2:
 					Bukkit.broadcastMessage("\247e" + String.valueOf(PlayerDatas.get(i).getRank()) + "nd : \247a" + PlayerDatas.get(i).getName());
@@ -166,20 +177,26 @@ public class PlayerManager {
 	}
 	
 	public static void playerOut() {
-		RemainPlayer--;
-		PlayerDatas.get(RemainPlayer).setOut(true);
-		Player outPlayer = PlayerDatas.get(RemainPlayer).getData();
-		outPlayer.setGameMode(GameMode.SPECTATOR);
+		if (Main.GAME_START) {
+			RemainPlayer--;
+			PlayerDatas.get(RemainPlayer).setOut(true);
+			Player outPlayer = PlayerDatas.get(RemainPlayer).getData();
+			outPlayer.setHealth(0);
+			outPlayer.playSound(outPlayer.getLocation(), Sound.ENTITY_LIGHTNING_IMPACT, 100, 0.55f);
+			outPlayer.playSound(outPlayer.getLocation(), Sound.ENTITY_LIGHTNING_THUNDER, 100, 1);
+			outPlayer.getLocation().getWorld().strikeLightningEffect(outPlayer.getLocation());
+			outPlayer.setGameMode(GameMode.SPECTATOR);
 		
-		PlayerDatas.get(RemainPlayer).getData().getLocation();
-		Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \2478" + String.valueOf(PlayerDatas.get(RemainPlayer).getName()) + "\2477님이 탈락했습니다.");
-		Collections.sort(PlayerDatas, new MiniComparator());
-		setExp();
-		if ((PlayerManager.RemainPlayer == Main.ARENA_START_PERSON) && !Main.ARENA_MODE) {
-			TaskManager.ArenaStartTimer(Main.instance);
-		}
-		else if (PlayerManager.RemainPlayer == 1) {
-			EndGame();
+			PlayerDatas.get(RemainPlayer).getData().getLocation();
+			Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \2478" + String.valueOf(PlayerDatas.get(RemainPlayer).getName()) + "\2477님이 탈락했습니다.");
+			Collections.sort(PlayerDatas, new MiniComparator());
+			setExp();
+			if ((PlayerManager.RemainPlayer == Main.ARENA_START_PERSON) && !Main.ARENA_MODE) {
+				TaskManager.ArenaStartTimer(Main.instance);
+			}
+			else if (PlayerManager.RemainPlayer == 1) {
+				EndGame();
+			}
 		}
 	}
 	
@@ -202,6 +219,7 @@ public class PlayerManager {
 					second.setRank(Temp);
 					Collections.sort(PlayerDatas, new MiniComparator());
 					setExp();
+					first.getData().playSound(first.getData().getLocation(), Sound.ENTITY_FIREWORK_LAUNCH, 30L, 1.5f);
 					if (Main.SHOW_CHANGE_RANKING) {
 						Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247aRank Switch!");
 						switch (first.getRank()) {
@@ -273,6 +291,9 @@ public class PlayerManager {
 		for (PlayerInfo pl : PlayerDatas) {
 			if (!pl.getOut()) {
 				Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \2476" + pl.getName() + " Win!");
+				pl.getData().playSound(pl.getData().getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 100L, 1L);
+				pl.getData().playSound(pl.getData().getLocation(), Sound.ENTITY_FIREWORK_LARGE_BLAST, 50L, 1L);
+				pl.getData().spawnParticle(Particle.FIREWORKS_SPARK, pl.getData().getLocation(), 150, 0.25, 0.25, 0.25);
 			}
 		}
 		Bukkit.getScheduler().cancelAllTasks();

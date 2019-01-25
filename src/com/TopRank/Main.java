@@ -1,6 +1,7 @@
 package com.TopRank;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -8,6 +9,7 @@ public class Main extends JavaPlugin implements Listener{
 	public static PlayerManager PManager;
 	
 	public static boolean GAME_START = false;
+	public static boolean DEBUG_SCHEDULER = false;
 	public static boolean QUICK_START = true;
 	public static boolean FIRST_SHOW_RANKING = true;
 	public static boolean FIRST_CLEAR_INV = true;
@@ -40,6 +42,7 @@ public class Main extends JavaPlugin implements Listener{
 		saveConfig();
 
 		QUICK_START = getConfig().getBoolean("빠른 시작"); // O
+		DEBUG_SCHEDULER = getConfig().getBoolean("스케쥴러 디버그"); // O
 		FIRST_SHOW_RANKING = getConfig().getBoolean("게임 시작 시 순위 공개"); // O
 		FIRST_CLEAR_INV = getConfig().getBoolean("게임 시작 시 인벤토리 초기화"); // O
 		USE_EXP_BAR = getConfig().getBoolean("경험치 바 사용"); // O
@@ -51,7 +54,7 @@ public class Main extends JavaPlugin implements Listener{
 		ARENA_OUT_ACTIVE = getConfig().getBoolean("아레나 모드 1위 탈락"); // O
 		ARENA_START_TIME = getConfig().getInt("아레나 모드 활성화 시간"); 
 		ARENA_START_PERSON = getConfig().getInt("아레나 모드 활성화 인원"); 
-		ARENA_TIMER_OUT = getConfig().getInt("아레나 모드 탈락 시간"); // O?
+		ARENA_TIMER_OUT = getConfig().getInt("아레나 모드 탈락 시간"); // O
 		
 		if (ARENA_TIMER_OUT <= -1) {
 			ARENA_OUT_ACTIVE = true;
@@ -71,6 +74,10 @@ public class Main extends JavaPlugin implements Listener{
 		System.out.println("아레나 모드 활성화 시간 : " + String.valueOf(ARENA_START_TIME) + "분");
 		System.out.println("아레나 모드 활성화 인원 : " + String.valueOf(ARENA_START_PERSON) + "명");
 		System.out.println("아레나 모드 탈락 시간 : " + String.valueOf(ARENA_TIMER_OUT) + "초");
+		
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			PlayerManager.addPlayer(p);
+		}
 	}
 	
 	@Override

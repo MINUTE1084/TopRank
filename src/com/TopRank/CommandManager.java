@@ -85,7 +85,9 @@ public class CommandManager implements CommandExecutor {
 							Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247c권한이 부족합니다.");
 							return false;
 						}
-						PlayerManager.locs.add(p.getLocation());
+						Location loc = p.getLocation();
+						loc.add(0, 1, 0);
+						PlayerManager.locs.add(loc);
 						sender.sendMessage("\2471[\247bTopRank\2471] \2477현재 좌표를 추가했습니다.");
 						return true;
 					}
@@ -111,7 +113,9 @@ public class CommandManager implements CommandExecutor {
 							Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247c권한이 부족합니다.");
 							return false;
 						}
-						PlayerManager.arenaLoc = p.getLocation();
+						Location loc = p.getLocation();
+						loc.add(0, 1, 0);
+						PlayerManager.arenaLoc = loc;
 						sender.sendMessage("\2471[\247bTopRank\2471] \2477현재 좌표를 설정했습니다.");
 					}
 					else sender.sendMessage("\2471[\247bTopRank\2471] \2477플레이어만 설정 가능합니다.");
