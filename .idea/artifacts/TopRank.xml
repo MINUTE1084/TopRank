@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="TopRank">
+    <output-path>$PROJECT_DIR$/../api/plugins</output-path>
+    <root id="archive" name="TopRank.jar">
+      <element id="module-output" name="TopRank" />
+      <element id="dir-copy" path="$PROJECT_DIR$/resource" />
+    </root>
+  </artifact>
+</component>

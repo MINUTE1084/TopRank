@@ -1,14 +1,9 @@
 package com.TopRank;
 
-import java.util.Random;
-
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Fireball;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.SmallFireball;
-import org.bukkit.entity.Snowball;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -18,8 +13,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Random;
+
 public class EventManager implements Listener {
-	
+
 	@EventHandler
 	public static void onPlayerJoin(PlayerJoinEvent event)
 	{
@@ -32,8 +29,13 @@ public class EventManager implements Listener {
 	@EventHandler
 	public static void onPlayerQuit(PlayerQuitEvent event)
 	{
+		if (Main.GAME_START) {
+			Bukkit.getScheduler().cancelTasks(Bukkit.getPluginManager().getPlugin("TopRank"));
+			TaskManager.ClaerTimer();
+			Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \247c플레이어가 접속을 종료하여 게임을 종료합니다.");
+		}
 		Player p = event.getPlayer();
-		for (PlayerInfo pl : PlayerManager.PlayerDatas){
+		for (PlayerInfo pl : PlayerManager.PlayerDatas) {
 			if (pl.getData() == p) {
 				PlayerManager.removePlayer(pl);
 				return;

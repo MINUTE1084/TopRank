@@ -9,7 +9,18 @@ public class TaskManager {
 	static int time_Broadcast = 0, Broadcast_Scheduler = 0;
 	static int time_ArenaMain = 0, ArenaMain_Scheduler = 0;
 	static int time_ArenaOut = 0, ArenaOut_Scheduler = 0;
-	
+
+	public static void ClaerTimer(){
+		time_Explane = 0; Explane_Scheduler = 0;
+		time_Main = 0; Main_Scheduler = 0;
+		time_Out = 0; Out_Scheduler = 0;
+		time_Broadcast = 0; Broadcast_Scheduler = 0;
+		time_ArenaMain = 0; ArenaMain_Scheduler = 0;
+		time_ArenaOut = 0; ArenaOut_Scheduler = 0;
+		Main.GAME_START = false;
+		Main.ARENA_MODE = false;
+	}
+
 	public static void ExplaneTimer(Main main) {
 		int Dealy = 15;
 		
@@ -96,6 +107,7 @@ public class TaskManager {
 	public static void StartTimer(Main main) {
 		Main_Scheduler = main.getServer().getScheduler().scheduleSyncRepeatingTask(main, new Runnable() {
 			public void run() {
+
 				switch (time_Main) {
 				case 0:
 					main.getServer().getScheduler().cancelTask(Explane_Scheduler);
@@ -111,14 +123,23 @@ public class TaskManager {
 					}
 					break;
 				default:
-					if (Main.ARENA_START_TIME >= 0 || Main.ARENA_START_PERSON >= 0) {
-						if (Main.ARENA_START_TIME * 60 <= time_Main || Main.ARENA_START_PERSON <= PlayerManager.RemainPlayer) {
-							ArenaStartTimer(main);
-						}
+					PlayerManager.setExp();
+					boolean arenaTime = true;
+					boolean arenaCount = true;
+					if (Main.ARENA_START_TIME >= 0) {
+						if (Main.ARENA_START_TIME * 60 > time_Main) arenaTime = false;
 					}
+					if (Main.ARENA_START_PERSON >= 0) {
+						if (Main.ARENA_START_PERSON <= PlayerManager.RemainPlayer) arenaCount = false;
+					}
+					if (arenaTime && arenaCount) {
+						ArenaStartTimer(main);
+					}
+					if (Main.DEBUG_SCHEDULER)
+						Bukkit.getConsoleSender().sendMessage("[TopRank] arenaTime : " + arenaTime + ", arenaCount : " + arenaCount);
 				}
 				if (Main.DEBUG_SCHEDULER)
-					System.out.println("[TopRank] Main : " + String.valueOf(time_Main));
+					Bukkit.getConsoleSender().sendMessage("[TopRank] Main : " + String.valueOf(time_Main));
 				time_Main++;
 			}
 		}, 0, 20);
@@ -129,6 +150,7 @@ public class TaskManager {
 			public void run() {
 				main.getServer().getScheduler().cancelTask(Main_Scheduler);
 				main.getServer().getScheduler().cancelTask(Out_Scheduler);
+				PlayerManager.setExp();
 				if (time_ArenaMain == 0) {
 					Main.ARENA_MODE = true;
 					Bukkit.broadcastMessage("\2471[\247bTopRank\2471] \2476ARENA MODE");
@@ -136,7 +158,7 @@ public class TaskManager {
 					ArenaOutTimer(main);
 				}
 				if (Main.DEBUG_SCHEDULER)
-					System.out.println("[TopRank] ArenaMain : " + String.valueOf(time_ArenaMain));
+					Bukkit.getConsoleSender().sendMessage("[TopRank] ArenaMain : " + String.valueOf(time_ArenaMain));
 				time_ArenaMain++;
 			}
 		}, 0, 20);
@@ -150,7 +172,7 @@ public class TaskManager {
 						PlayerManager.showRanking();
 					}
 					if (Main.DEBUG_SCHEDULER)
-						System.out.println("[TopRank] Broadcast : " + String.valueOf(time_Broadcast));
+						Bukkit.getConsoleSender().sendMessage("[TopRank] Broadcast : " + String.valueOf(time_Broadcast));
 					time_Broadcast++;
 				}
 			}, 0, Main.TIMER_SHOW_RANKING * 20);
@@ -171,7 +193,7 @@ public class TaskManager {
 							PlayerManager.playerOut();
 						}
 						if (Main.DEBUG_SCHEDULER)
-							System.out.println("[TopRank] Out : " + String.valueOf(time_Out));
+							Bukkit.getConsoleSender().sendMessage("[TopRank] Out : " + String.valueOf(time_Out));
 					time_Out++;
 					}
 				}, 0, Main.TIMER_OUT * 20);
@@ -195,7 +217,7 @@ public class TaskManager {
 							PlayerManager.playerOut();
 						}
 						if (Main.DEBUG_SCHEDULER)
-							System.out.println("[TopRank] ArenaOut : " + String.valueOf(time_ArenaOut));
+							Bukkit.getConsoleSender().sendMessage("[TopRank] ArenaOut : " + String.valueOf(time_ArenaOut));
 						time_ArenaOut++;
 					}
 				}, 0, Main.ARENA_TIMER_OUT * 20);

@@ -1,0 +1,7 @@
+name: TopRank
+main: com.TopRank.Main
+version: 1.0
+api-version: 1.17
+commands:
+  toprank:
+    description: TopRank Game Command (Made by MINUTE.)
